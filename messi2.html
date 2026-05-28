@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zenith Mindset Dashboard</title>
+    <style>
+        /* Modern, clean mobile-first styling */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            color: #38bdf8;
+            margin-bottom: 5px;
+            font-size: 1.8rem;
+        }
+
+        p.subtitle {
+            color: #94a3b8;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .card {
+            background-color: #1e293b;
+            border-radius: 12px;
+            padding: 20px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        .card h2 {
+            font-size: 1.2rem;
+            margin-top: 0;
+            color: #38bdf8;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 10px;
+        }
+
+        /* Interactive Mindset Switcher Styles */
+        .thought-container {
+            min-height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-weight: 500;
+            padding: 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-style: italic;
+            line-height: 1.4;
+        }
+
+        .fixed-state {
+            background-color: #451a03;
+            color: #f97316;
+            border: 1px solid #7c2d12;
+        }
+
+        .growth-state {
+            background-color: #064e3b;
+            color: #34d399;
+            border: 1px solid #065f46;
+        }
+
+        button {
+            width: 100%;
+            background-color: #38bdf8;
+            color: #0f172a;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: background-color 0.2s;
+        }
+
+        button:active {
+            background-color: #0ea5e9;
+        }
+
+        .btn-secondary {
+            background-color: #334155;
+            color: #f8fafc;
+            margin-top: 8px;
+        }
+
+        .btn-secondary:active {
+            background-color: #475569;
+        }
+
+        /* Daily Wins Styles */
+        .win-input-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 12px;
+            color: #f8fafc;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: #38bdf8;
+        }
+
+        .win-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .win-item {
+            background-color: #0f172a;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            border-left: 4px solid #34d399;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0 5px;
+            width: auto;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Zenith Mindset</h1>
+        <p class="subtitle">Embrace the challenge, unlock the potential.</p>
+    </header>
+
+    <!-- Card 1: Interactive Reframer -->
+    <div class="card">
+        <h2>Reframe Your Thoughts</h2>
+        <p class="subtitle" style="margin-bottom: 15px;">Shift the perspective on common mental blocks.</p>
+        
+        <div id="thoughtDisplay" class="thought-container fixed-state">
+            "This is too hard, I can't do it."
+        </div>
+
+        <button id="actionBtn" onclick="handleMindsetClick()">Shift Perspective 🔄</button>
+    </div>
+
+    <!-- Card 2: Daily Wins Logger (Local Storage) -->
+    <div class="card">
+        <h2>Daily Wins Tracker</h2>
+        <p class="subtitle" style="margin-bottom: 15px;">Log your growth steps, coding milestones, or efforts today.</p>
+        
+        <div class="win-input-group">
+            <input type="text" id="winInput" placeholder="What did you push through today?">
+            <button style="width: auto; margin: 0; padding: 0 15px;" onclick="addWin()">Add</button>
+        </div>
+
+        <ul id="winList" class="win-list">
+            <!-- Dynamically populated via JS -->
+        </ul>
+    </div>
+
+    <script>
+        // --- MULTI-THOUGHT REFRAMER LOGIC ---
+        const mindsetPairs = [
+            { fixed: "This is too hard, I can't do it.", growth: "This is taking time and effort, but I am building the muscle to figure it out." },
+            { fixed: "I made a huge mistake and ruined my progress.", growth: "Mistakes are just raw data. Now I know exactly what doesn't work so I can adjust." },
+            { fixed: "I'm not naturally good at coding/math/this strategy.", growth: "Skills are built through consistency, not luck. Practice is my superpower." },
+            { fixed: "Their project looks way better than mine, I give up.", growth: "Comparison is a trap. I'm focusing on my own track and learning from their wins." }
+        ];
+
+        let currentIndex = 0;
+        let isShowingGrowth = false;
+
+        const display = document.getElementById('thoughtDisplay');
+        const actionBtn = document.getElementById('actionBtn');
+
+        function handleMindsetClick() {
+            if (!isShowingGrowth) {
+                // Flip to the growth mindset response
+                display.innerText = `"${mindsetPairs[currentIndex].growth}"`;
+                display.className = 'thought-container growth-state';
+                actionBtn.innerText = "Next Mental Block ➡️";
+                actionBtn.className = "btn-secondary";
+                isShowingGrowth = true;
+            } else {
+                // Move to the next fixed thought in the list
+                currentIndex = (currentIndex + 1) % mindsetPairs.length;
+                display.innerText = `"${mindsetPairs[currentIndex].fixed}"`;
+                display.className = 'thought-container fixed-state';
+                actionBtn.innerText = "Shift Perspective 🔄";
+                actionBtn.className = "";
+                isShowingGrowth = false;
+            }
+        }
+
+
+        // --- DAILY WINS LOGS (LOCAL STORAGE) ---
+        let wins = JSON.parse(localStorage.getItem('zenith_wins')) || [];
+
+        function renderWins() {
+            const winList = document.getElementById('winList');
+            winList.innerHTML = '';
+            
+            if (wins.length === 0) {
+                winList.innerHTML = `<li class="subtitle" style="text-align:center; padding: 10px;">No wins logged yet today. Keep moving!</li>`;
+                return;
+            }
+
+            wins.forEach((win, index) => {
+                const li = document.createElement('li');
+                li.className = 'win-item';
+                li.innerHTML = `
+                    <span>✨ ${win}</span>
+                    <button class="delete-btn" onclick="deleteWin(${index})">×</button>
+                `;
+                winList.appendChild(li);
+            });
+        }
+
+        function addWin() {
+            const input = document.getElementById('winInput');
+            const text = input.value.trim();
+            
+            if (text) {
+                wins.push(text);
+                localStorage.setItem('zenith_wins', JSON.stringify(wins));
+                input.value = '';
+                renderWins();
+            }
+        }
+
+        function deleteWin(index) {
+            wins.splice(index, 1);
+            localStorage.setItem('zenith_wins', JSON.stringify(wins));
+            renderWins();
+        }
+
+        // Trigger input addition on 'Enter' key press
+        document.getElementById('winInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') addWin();
+        });
+
+        // Initialize display on load
+        renderWins();
+    </script>
+
+</body>
+</html>
